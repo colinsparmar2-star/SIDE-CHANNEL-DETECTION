@@ -84,8 +84,8 @@ Both implementations are included to demonstrate the project across different de
 
 ### XGBoost Confusion Matrix
 
-![XGBoost Confusion Matrix](confusion_matrix_xgboost.png)
+![XGBoost Confusion Matrix](results/confusion_matrix_xgboost.png)
 
 ### ROC Curve
 
-![ROC Curve - AUC 0.989](roc_curve_0.989.png)
+![ROC Curve - AUC 0.989](results/roc_curve_auc_0.989.png)
