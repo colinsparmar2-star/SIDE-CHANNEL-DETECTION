@@ -71,6 +71,8 @@ SIDE-CHANNEL-DETECTION/
 ├── README.md
 ├── .gitignore
 └── .gitattributes
+```
+
 ## Implementation Versions
 
 ### Local VS Code
