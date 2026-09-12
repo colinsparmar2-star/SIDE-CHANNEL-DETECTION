@@ -1,0 +1,204 @@
+# =========================
+# IMPORT LIBRARIES
+# =========================
+
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# =========================
+# COLUMN NAMES
+# =========================
+
+columns = [
+'duration','protocol_type','service','flag','src_bytes',
+'dst_bytes','land','wrong_fragment','urgent','hot',
+'num_failed_logins','logged_in','num_compromised',
+'root_shell','su_attempted','num_root',
+'num_file_creations','num_shells','num_access_files',
+'num_outbound_cmds','is_host_login','is_guest_login',
+'count','srv_count','serror_rate','srv_serror_rate',
+'rerror_rate','srv_rerror_rate','same_srv_rate',
+'diff_srv_rate','srv_diff_host_rate','dst_host_count',
+'dst_host_srv_count','dst_host_same_srv_rate',
+'dst_host_diff_srv_rate','dst_host_same_src_port_rate',
+'dst_host_srv_diff_host_rate','dst_host_serror_rate',
+'dst_host_srv_serror_rate','dst_host_rerror_rate',
+'dst_host_srv_rerror_rate','label','difficulty'
+]
+
+# =========================
+# LOAD DATASET
+# =========================
+
+df = pd.read_csv(
+    '/content/KDDTrain+.txt',
+    names=columns
+)
+
+print(df.head())
+
+# =========================
+# CONVERT LABELS
+# =========================
+
+df['label'] = df['label'].apply(
+    lambda x: 0 if x == 'normal' else 1
+)
+
+# =========================
+# ENCODE CATEGORICAL COLUMNS
+# =========================
+
+encoder = LabelEncoder()
+
+df['protocol_type'] = encoder.fit_transform(df['protocol_type'])
+df['service'] = encoder.fit_transform(df['service'])
+df['flag'] = encoder.fit_transform(df['flag'])
+
+# =========================
+# FEATURES AND TARGET
+# =========================
+
+X = df.drop(['label','difficulty'], axis=1)
+
+y = df['label']
+
+# =========================
+# TRAIN TEST SPLIT
+# =========================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# =========================
+# FEATURE SCALING
+# =========================
+
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# =========================
+# LOGISTIC REGRESSION
+# =========================
+
+lr_model = LogisticRegression(max_iter=1000)
+
+lr_model.fit(X_train, y_train)
+
+lr_predictions = lr_model.predict(X_test)
+
+print(
+    "\nLogistic Regression Accuracy:",
+    accuracy_score(y_test, lr_predictions)
+)
+
+# =========================
+# RANDOM FOREST
+# =========================
+
+rf_model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42
+)
+
+rf_model.fit(X_train, y_train)
+
+rf_predictions = rf_model.predict(X_test)
+
+print(
+    "Random Forest Accuracy:",
+    accuracy_score(y_test, rf_predictions)
+)
+
+# =========================
+# XGBOOST
+# =========================
+
+xgb_model = XGBClassifier(
+    eval_metric='logloss',
+    random_state=42
+)
+
+xgb_model.fit(X_train, y_train)
+
+xgb_predictions = xgb_model.predict(X_test)
+
+print(
+    "XGBoost Accuracy:",
+    accuracy_score(y_test, xgb_predictions)
+)
+
+# =========================
+# CONFUSION MATRIX
+# =========================
+
+cm = confusion_matrix(y_test, xgb_predictions)
+
+plt.figure(figsize=(6,5))
+
+sns.heatmap(cm, annot=True, fmt='d')
+
+plt.title("Confusion Matrix")
+
+plt.xlabel("Predicted")
+
+plt.ylabel("Actual")
+
+plt.show()
+
+# =========================
+# ROC CURVE
+# =========================
+
+xgb_probs = xgb_model.predict_proba(X_test)[:,1]
+
+fpr, tpr, thresholds = roc_curve(y_test, xgb_probs)
+
+roc_auc = roc_auc_score(y_test, xgb_probs)
+
+plt.figure(figsize=(6,5))
+
+plt.plot(fpr, tpr, label='AUC = %0.3f' % roc_auc)
+
+plt.plot([0,1],[0,1],'--')
+
+plt.xlabel('False Positive Rate')
+
+plt.ylabel('True Positive Rate')
+
+plt.title('ROC Curve')
+
+plt.legend()
+
+plt.show()
+
+# =========================
+# CLASSIFICATION REPORT
+# =========================
+
+print("\nClassification Report:\n")
+
+print(classification_report(y_test, xgb_predictions))
