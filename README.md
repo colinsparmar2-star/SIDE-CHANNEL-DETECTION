@@ -71,3 +71,12 @@ SIDE-CHANNEL-DETECTION/
 ├── README.md
 ├── .gitignore
 └── .gitattributes
+## Implementation Versions
+
+### Local VS Code
+The Local VS Code implementation uses a generated synthetic dataset to demonstrate the machine learning classification pipeline and model evaluation.
+
+### Google Colab
+The Google Colab implementation uses the KDDTrain+ dataset for network intrusion detection and evaluates multiple machine learning classification models.
+
+Both implementations are included to demonstrate the project across different development environments.
