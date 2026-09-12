@@ -80,3 +80,12 @@ The Local VS Code implementation uses a generated synthetic dataset to demonstra
 The Google Colab implementation uses the KDDTrain+ dataset for network intrusion detection and evaluates multiple machine learning classification models.
 
 Both implementations are included to demonstrate the project across different development environments.
+## Results
+
+### XGBoost Confusion Matrix
+
+![XGBoost Confusion Matrix](results/confusion_matrix_xgboost.png)
+
+### ROC Curve
+
+![ROC Curve - AUC 0.989](results/roc_curve_auc_0.989.png)
